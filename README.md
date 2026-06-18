@@ -105,8 +105,37 @@ Signature is same to `static` tag from Django.
 <img alt="" src="{% static 'image.jpg' %}" />
 ```
 
+You can also use [inline loaders](https://webpack.js.org/concepts/loaders/#inline)
+syntax to process assets with additional Webpack loaders:
+
+```nunjucks
+<img src="{% static '!url-loader!./image.png' %}" />
+```
+
+Both static and dynamic assets support inline loaders syntax.
+
 See [more examples](https://ogonkov.github.io/nunjucks-loader/examples/assets/)
 of setup and using assets in loader.
+
+### Dynamic templates
+
+Loader supports arbitrary expressions in `{% include %}`, `{% import %}`,
+and `{% extends %}` tags, same as [Nunjucks runtime](https://mozilla.github.io/nunjucks/templating.html#include)
+does.
+
+```nunjucks
+{% set name = 'base' %}
+{% extends 'templates/' + name + '.njk' %}
+
+{% set macroName = 'form' %}
+{% import 'templates/' + macroName + '-macro.njk' as form %}
+
+{{ form.field('user') }}
+```
+
+All templates that match the dynamic expression are bundled at build time
+via `require.context`, so they are available at runtime without additional
+requests.
 
 ### Asynchronous support
 
