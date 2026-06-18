@@ -154,7 +154,6 @@ exports[`Advanced compilation should compile dynamic template imports 1`] = `
   <head>
     <meta charset=\\"utf-8\\">
     <title>Dynamic</title>
-    <link rel=\\"stylesheet\\" href=\\"bundles/fixtures/django_project/app_example/static/foo/bar/style.css\\"/>
   </head>
   <body>
     

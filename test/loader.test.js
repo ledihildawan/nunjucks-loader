@@ -91,12 +91,7 @@ describe('Advanced compilation', function() {
     });
 
     test('should compile dynamic template imports', async function() {
-        const output = await compiler('fixtures/templates/dynamic.njk', {
-            ...loaderBaseOptions,
-            assetsPaths: [
-                'test/fixtures/django_project/app_example/static'
-            ]
-        });
+        const output = await compiler('fixtures/templates/dynamic.njk', loaderBaseOptions);
 
         expect(output({
             title: 'Dynamic'
