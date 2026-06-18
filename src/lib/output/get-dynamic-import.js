@@ -15,7 +15,15 @@ export function getDynamicImport(loaderContext, assetPath, assetImport, {
     if (isDynamicImport) {
         importPath = stringify(loaderContext, assetImport).toString();
     } else {
-        importPath = stringifyRequest(loaderContext, assetImport.toString());
+        const rawPath = assetImport.toString();
+        const lastBangIndex = rawPath.lastIndexOf('!');
+        if (lastBangIndex > 0) {
+            const loaderPrefix = rawPath.substring(0, lastBangIndex + 1);
+            const filePath = rawPath.substring(lastBangIndex + 1);
+            importPath = loaderPrefix + stringifyRequest(loaderContext, filePath);
+        } else {
+            importPath = stringifyRequest(loaderContext, rawPath);
+        }
     }
 
     return  isDynamicImport ?

@@ -90,20 +90,17 @@ describe('Advanced compilation', function() {
         expect(output()).toMatchSnapshot();
     });
 
-    test('should output warning for dynamic templates imports', async function() {
-        const {stats} = await statsCompiler('fixtures/templates/dynamic.njk', {
+    test('should compile dynamic template imports', async function() {
+        const output = await compiler('fixtures/templates/dynamic.njk', {
             ...loaderBaseOptions,
             assetsPaths: [
                 'test/fixtures/django_project/app_example/static'
             ]
         });
 
-        expect(stats.toJson().warnings).toContainEqual(expect.objectContaining({
-            message: expect.stringContaining('Skipping "test/fixtures/assets/" + name.')
-        }));
-        expect(stats.toJson().warnings).toContainEqual(expect.objectContaining({
-            message: expect.stringContaining('Skipping "test/fixtures/" + macroName + "-macro.njk".')
-        }));
+        expect(output({
+            title: 'Dynamic'
+        })).toMatchSnapshot();
     });
 
     describe('globals', function() {

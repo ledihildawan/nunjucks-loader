@@ -1,7 +1,9 @@
 import {stringifyRequest} from 'loader-utils';
 
 import {IMPORTS_PREFIX, TEMPLATE_DEPENDENCIES} from '../constants';
+import {isSymbol} from '../import-wrapper/is-symbol';
 import {getImportStr} from '../utils/get-import-str';
+import {toRegExpSource} from '../utils/to-regexp-source';
 import {toVar} from '../utils/to-var';
 
 function getAssignments(assignments) {
@@ -31,6 +33,50 @@ function getImports(imports, assignments) {
     `;
 }
 
+function getDynamicTemplateImport(loaderContext, fullPath, importVar) {
+    const parts = fullPath.importValue;
+
+    let directoryRaw = '';
+    let regexStr = '';
+    let foundSymbol = false;
+
+    for (const part of parts) {
+        if (isSymbol(part)) {
+            foundSymbol = true;
+            regexStr += '.*';
+        } else if (foundSymbol) {
+            regexStr += toRegExpSource(part.valueOf());
+        } else {
+            directoryRaw += part.valueOf();
+        }
+    }
+
+    if (regexStr === '' || regexStr === '.*') {
+        regexStr = '.*\\.njk';
+    }
+
+    const directory = stringifyRequest(loaderContext, directoryRaw);
+    const regExp = new RegExp(regexStr + '$');
+
+    return `
+    var ${importVar} = (function() {
+        var __context = require.context(${directory}, true, ${regExp});
+        var __result = {${TEMPLATE_DEPENDENCIES}: {templates: {}, globals: {}, extensions: {}, filters: {}, assets: {}}};
+        __context.keys().forEach(function(__key) {
+            var __mod = __context(__key);
+            var __dep = (__mod && __mod.default || __mod);
+            if (__dep && __dep.${TEMPLATE_DEPENDENCIES}) {
+                Object.assign(__result.${TEMPLATE_DEPENDENCIES}.templates, __dep.${TEMPLATE_DEPENDENCIES}.templates || {});
+                Object.assign(__result.${TEMPLATE_DEPENDENCIES}.globals, __dep.${TEMPLATE_DEPENDENCIES}.globals || {});
+                Object.assign(__result.${TEMPLATE_DEPENDENCIES}.extensions, __dep.${TEMPLATE_DEPENDENCIES}.extensions || {});
+                Object.assign(__result.${TEMPLATE_DEPENDENCIES}.filters, __dep.${TEMPLATE_DEPENDENCIES}.filters || {});
+                Object.assign(__result.${TEMPLATE_DEPENDENCIES}.assets, __dep.${TEMPLATE_DEPENDENCIES}.assets || {});
+            }
+        });
+        return __result;
+    })();`;
+}
+
 function foldDependenciesToImports(
     loaderContext,
     esModule,
@@ -38,9 +84,26 @@ function foldDependenciesToImports(
     [, fullPath],
     i
 ) {
-    const path = stringifyRequest(loaderContext, fullPath.toString());
     const importVar = toVar(`${IMPORTS_PREFIX}_dep_${i}`);
     const join = joinAssignments.bind(null, assignment, importVar);
+
+    if (fullPath.isDynamic()) {
+        return [
+            `
+            ${imports}
+            ${getDynamicTemplateImport(loaderContext, fullPath, importVar)}
+            `,
+            {
+                templates: join('templates'),
+                globals: join('globals'),
+                extensions: join('extensions'),
+                filters: join('filters'),
+                assets: join('assets')
+            }
+        ];
+    }
+
+    const path = stringifyRequest(loaderContext, fullPath.toString());
 
     return [
         `
@@ -69,7 +132,7 @@ function foldDependenciesToImports(
  *
  * @param {Object} loaderContext
  * @param {boolean} esModule
- * @param {Array<string[]>} dependencies
+ * @param {Array<[ImportWrapper, ImportWrapper]>} dependencies
  * @returns {string}
  */
 export function getTemplateDependenciesImport(loaderContext, esModule, dependencies) {
