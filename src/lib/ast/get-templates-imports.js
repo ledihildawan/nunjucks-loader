@@ -34,12 +34,13 @@ const nodeTypes = [
 /**
  * @param {Object} loaderContext
  * @param {nunjucks.nodes.Root} nodes
- * @param {string[]}            searchPaths
+ * @param {string}            templateContext
+ * @param {Object}             [webpackAlias]
  * @returns {Promise<[ImportWrapper, ImportWrapper][]>}
  */
-export function getTemplatesImports(loaderContext, nodes, searchPaths) {
+export function getTemplatesImports(loaderContext, nodes, templateContext, webpackAlias = {}) {
     const templateDeps = getNodesValues(nodes, nodeTypes, getTemplatePath).filter(isUniqueAsset);
-    const possiblePaths = getPossiblePaths(templateDeps, searchPaths);
+    const possiblePaths = getPossiblePaths(templateDeps, templateContext, webpackAlias);
     const resolvedTemplates = possiblePaths.map(filterPaths);
 
     return Promise.all(resolvedTemplates);

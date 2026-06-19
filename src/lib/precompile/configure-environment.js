@@ -3,28 +3,23 @@ import nunjucks from 'nunjucks';
 import {addonsLoader} from '../addons-wrapper/addons-loader';
 
 
-function configure(templatesPath, opts) {
-    return new nunjucks.Environment(
-        new nunjucks.FileSystemLoader(templatesPath),
-        opts
-    );
+function configure(opts) {
+    return new nunjucks.Environment(null, opts);
 }
 
 /**
  * @param {Object}   env
- * @param {string[]} env.searchPaths
  * @param {Object}   env.options
  * @param {Array}    env.extensions
  * @param {Array}    env.filters
  * @returns {nunjucks.Environment}
  */
 export async function configureEnvironment({
-    searchPaths,
     options,
     extensions = [],
     filters = []
 } = {}) {
-    const env = configure(searchPaths, options);
+    const env = configure(options);
 
     await Promise.all([
         addonsLoader(extensions),

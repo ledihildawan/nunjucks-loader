@@ -1,7 +1,24 @@
+import path from 'path';
+
 import {getModule} from '../utils/get-module';
 import {getRegexMatches} from '../utils/get-regex-matches';
 
-import {ASSETS_KEY} from './contants';
+import {ASSETS_KEY, WEBPACK_ALIAS_KEY} from './contants';
+
+function resolveAlias(assetPath, aliasMap) {
+    if (typeof assetPath !== 'string') {
+        return assetPath;
+    }
+    for (const [aliasName, aliasPath] of Object.entries(aliasMap)) {
+        if (assetPath.startsWith(aliasName + '/') || assetPath === aliasName) {
+            const aliasValue = Array.isArray(aliasPath) ? aliasPath[0] : aliasPath;
+            const remainingPath = assetPath.slice(aliasName.length);
+            const normalizedRemaining = remainingPath.startsWith('/') ? remainingPath.slice(1) : remainingPath;
+            return path.resolve(aliasValue, normalizedRemaining);
+        }
+    }
+    return assetPath;
+}
 
 export class StaticExtension {
     constructor() {
@@ -27,7 +44,9 @@ export class StaticExtension {
     run(...args) {
         const callback = args.pop();
         const [context, url, exportVar] = args;
-        const assets = context.lookup(ASSETS_KEY);
+        const assets = context.lookup(ASSETS_KEY) || {};
+        const aliasMap = context.lookup(WEBPACK_ALIAS_KEY) || {};
+        const resolvedUrl = resolveAlias(url, aliasMap);
         let asset;
 
         for (const assetUUID in assets) {
@@ -36,9 +55,11 @@ export class StaticExtension {
             }
 
             const assetMeta = assets[assetUUID];
-            if (typeof assetMeta.path !== 'string' && assetMeta.path.test(url)) {
-                asset = assetMeta;
-            } else if (assetMeta.path === url) {
+            if (typeof assetMeta.path !== 'string') {
+                if (assetMeta.path.test(url) || assetMeta.path.test(resolvedUrl)) {
+                    asset = assetMeta;
+                }
+            } else if (resolveAlias(assetMeta.path, aliasMap) === resolvedUrl) {
                 asset = assetMeta;
             }
 
@@ -56,17 +77,17 @@ export class StaticExtension {
         const assetModule = getModule(asset.module);
 
         if (typeof assetModule === 'function') {
-            const args = getRegexMatches(url, asset.path);
+            const matches = getRegexMatches(url, asset.path);
 
-            Promise.resolve(assetModule(...args)).then(function(assetModule) {
-                const asset = getModule(assetModule);
+            Promise.resolve(assetModule(...matches)).then(function(assetModule) {
+                const resolvedAsset = getModule(assetModule);
                 if (exportVar) {
-                    context.setVariable(exportVar, asset);
+                    context.setVariable(exportVar, resolvedAsset);
 
                     return callback(null, '');
                 }
 
-                callback(null, asset);
+                callback(null, resolvedAsset);
             }, function(error) {
                 callback(error);
             });

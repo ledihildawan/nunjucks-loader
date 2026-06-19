@@ -1,4 +1,4 @@
-import {ASSETS_KEY} from '../../public/static-extension/contants';
+import {ASSETS_KEY, WEBPACK_ALIAS_KEY} from '../../public/static-extension/contants';
 import {TEMPLATE_DEPENDENCIES} from '../constants';
 
 import {getModuleOutput} from './get-module-output';
@@ -9,7 +9,8 @@ export function getLoaderOutput({
     imports,
     defaultExport,
     precompiled,
-    envOptions
+    envOptions,
+    webpackAlias = {}
 }) {
     return `
         ${imports}
@@ -18,6 +19,7 @@ export function getLoaderOutput({
         function nunjucksTemplate(ctx = {}) {
             const templateContext = {
                 ${ASSETS_KEY}: ${TEMPLATE_DEPENDENCIES}.assets,
+                ${WEBPACK_ALIAS_KEY}: ${JSON.stringify(webpackAlias)},
                 ...ctx
             };
 

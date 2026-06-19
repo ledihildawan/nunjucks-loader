@@ -4,7 +4,7 @@ import {nanoid} from 'nanoid';
 import webpack from 'webpack';
 
 
-export function statsCompiler(fixture, options = {}) {
+export function statsCompiler(fixture, options = {}, webpackConfig = {}) {
     const bundleName = nanoid();
 
     const compiler = webpack({
@@ -30,7 +30,9 @@ export function statsCompiler(fixture, options = {}) {
                 test: /\.(css|txt|md)$/,
                 type: 'asset/resource'
             }]
-        }
+        },
+        resolve: webpackConfig.resolve,
+        ...webpackConfig
     });
 
     return new Promise(function(resolve, reject) {

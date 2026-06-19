@@ -1,10 +1,11 @@
-import path from 'path';
-
 import {ERROR_MODULE_NOT_FOUND} from './lib/constants';
 import {doTransform} from './lib/do-transform';
 import {getLoaderOptions} from './lib/get-loader-options';
-import {getImportPath} from './lib/utils/get-import-path';
 
+
+function getImportPath(resourcePath) {
+    return resourcePath;
+}
 
 export default function nunjucksLoader(source) {
     const callback = this.async();
@@ -14,15 +15,10 @@ export default function nunjucksLoader(source) {
         return;
     }
 
-    const normalizedSearchPaths = [].concat(options.searchPaths).map(path.normalize);
-    let resourcePathImport = getImportPath(
-        this.resourcePath,
-        normalizedSearchPaths
-    );
+    let resourcePathImport = getImportPath(this.resourcePath);
 
     doTransform(source, this, {
         resourcePathImport,
-        normalizedSearchPaths,
         options
     }).then(function(result) {
         callback(null, result);

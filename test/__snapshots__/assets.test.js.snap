@@ -30,11 +30,8 @@ exports[`Assets should load dynamic assets 1`] = `
 `;
 
 exports[`Assets should load dynamic assets with trailing slashes 1`] = `
-"
-<p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-1.md</p>
-
+"<p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-1.md</p>
 <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-2.md</p>
-
 "
 `;
 
@@ -48,19 +45,8 @@ exports[`Assets should load exported dynamic assets 1`] = `
   </head>
   <body>
     
-    
-
-    
-        <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-1.md</p>
-    
-        <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-2.md</p>
-    
-
-    
-        <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-1.md</p>
-    
-        <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-2.md</p>
-    
+    <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-1.md</p>
+    <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-2.md</p>
 
   </body>
 </html>
@@ -111,11 +97,8 @@ exports[`Assets should load variables 1`] = `
   </head>
   <body>
     
-    
-        <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-1.md</p>
-    
-        <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-2.md</p>
-    
+    <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-1.md</p>
+    <p>bundles/fixtures/django_project/app_example/static/foo/bar/dynamic-example-2.md</p>
 
   </body>
 </html>

@@ -148,30 +148,6 @@ globals returned value
 "
 `;
 
-exports[`Advanced compilation should compile dynamic template imports 1`] = `
-"<!DOCTYPE html>
-<html lang=\\"en\\">
-  <head>
-    <meta charset=\\"utf-8\\">
-    <title>Dynamic</title>
-  </head>
-  <body>
-    
-    
-    
-
-    
-<div class=\\"field\\">
-  <input type=\\"text\\" name=\\"user\\"
-         value=\\"\\" />
-</div>
-
-
-  </body>
-</html>
-"
-`;
-
 exports[`Advanced compilation should compile templates with non-relative paths 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
@@ -196,6 +172,42 @@ exports[`Advanced compilation should compile templates with non-relative paths 1
 </body>
 </html>
 "
+`;
+
+exports[`Advanced compilation webpack alias resolution should resolve template imports using webpack resolve.alias 1`] = `
+"
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alias Test</title>
+</head>
+<body>
+    
+<div class=\\"button\\">
+    <button>Click me</button>
+</div>
+
+</body>
+</html>"
+`;
+
+exports[`Advanced compilation webpack alias resolution should resolve template imports using webpack resolve.alias with array path 1`] = `
+"
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alias Test</title>
+</head>
+<body>
+    
+<div class=\\"button\\">
+    <button>Click me</button>
+</div>
+
+</body>
+</html>"
 `;
 
 exports[`Simple compilation should compile builtin tags 1`] = `

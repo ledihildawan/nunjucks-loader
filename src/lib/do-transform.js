@@ -44,8 +44,7 @@ function registerDependencies(loaderContext, templates, assets) {
 
 export async function doTransform(source, loaderContext, {
     resourcePathImport,
-    options,
-    normalizedSearchPaths
+    options
 }) {
     const nunjucksOptions = {
         // https://mozilla.github.io/nunjucks/api.html#configure
@@ -74,6 +73,8 @@ export async function doTransform(source, loaderContext, {
         wrappedAddons.extensions,
         nunjucksOptions
     );
+    const webpackAlias = loaderContext._compiler.options.resolve?.alias || {};
+
     const usedDependencies = await getUsedDependencies(
         loaderContext,
         nodes,
@@ -82,8 +83,7 @@ export async function doTransform(source, loaderContext, {
         wrappedAddons.globals,
         {
             ...options,
-            assetsPaths: [].concat(options.assetsPaths),
-            searchPaths: normalizedSearchPaths
+            webpackAlias
         }
     );
 
@@ -102,7 +102,6 @@ export async function doTransform(source, loaderContext, {
     });
 
     const env = await configureEnvironment({
-        searchPaths: normalizedSearchPaths,
         options: nunjucksOptions,
         extensions: wrappedAddons.extensions,
         filters: wrappedAddons.filters
@@ -117,7 +116,9 @@ export async function doTransform(source, loaderContext, {
         ...nunjucksOptions,
         // Loader specific options
         jinjaCompat: options.jinjaCompat,
-        isAsyncTemplate: hasAsyncTags(nodes)
+        isAsyncTemplate: hasAsyncTags(nodes),
+        // Webpack alias map for runtime template resolution
+        __webpackAlias__: webpackAlias
     });
 
     return getLoaderOutput({
@@ -125,6 +126,7 @@ export async function doTransform(source, loaderContext, {
         imports: outputImports,
         precompiled: outputPrecompiled,
         envOptions,
-        defaultExport: outputExport
+        defaultExport: outputExport,
+        webpackAlias
     });
 }

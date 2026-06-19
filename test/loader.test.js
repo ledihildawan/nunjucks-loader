@@ -79,23 +79,41 @@ describe('Simple compilation', function() {
 
 describe('Advanced compilation', function() {
     test('should compile templates with non-relative paths', async function() {
-        const output = await compiler('fixtures/django_project/app_example/templates/main/main.njk', {
-            ...loaderBaseOptions,
-            searchPaths: [
-                'test/fixtures/django_project/app_example/templates',
-                '.'
-            ]
+        const output = await compiler('fixtures/django_project/app_example/templates/main/main.njk', loaderBaseOptions, {
+            resolve: {
+                alias: {
+                    '@templates': path.join(__dirname, 'fixtures/django_project/app_example/templates')
+                }
+            }
         });
 
         expect(output()).toMatchSnapshot();
     });
 
-    test('should compile dynamic template imports', async function() {
-        const output = await compiler('fixtures/templates/dynamic.njk', loaderBaseOptions);
+    describe('webpack alias resolution', function() {
+        test('should resolve template imports using webpack resolve.alias', async function() {
+            const output = await compiler('fixtures/alias/main.njk', loaderBaseOptions, {
+                resolve: {
+                    alias: {
+                        '@shared': path.join(__dirname, 'fixtures/alias/shared')
+                    }
+                }
+            });
 
-        expect(output({
-            title: 'Dynamic'
-        })).toMatchSnapshot();
+            expect(output()).toMatchSnapshot();
+        });
+
+        test('should resolve template imports using webpack resolve.alias with array path', async function() {
+            const output = await compiler('fixtures/alias/main.njk', loaderBaseOptions, {
+                resolve: {
+                    alias: {
+                        '@shared': [path.join(__dirname, 'fixtures/alias/shared')]
+                    }
+                }
+            });
+
+            expect(output()).toMatchSnapshot();
+        });
     });
 
     describe('globals', function() {

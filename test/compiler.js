@@ -1,8 +1,8 @@
 import {statsCompiler} from './stats-compiler';
 
 
-export default async (fixture, options = {}) => {
-    const {stats, bundleName} = await statsCompiler(fixture, options);
+export default async (fixture, options = {}, webpackConfig = {}) => {
+    const {stats, bundleName} = await statsCompiler(fixture, options, webpackConfig);
 
     if (stats.hasErrors()) {
         const [error] = stats.toJson().errors;

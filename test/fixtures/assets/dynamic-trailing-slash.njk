@@ -1,3 +1,2 @@
-{% for fileName in ['dynamic-example-1.md', 'dynamic-example-2.md'] %}
-<p>{% static 'foo/bar/' + fileName %}</p>
-{% endfor %}
+<p>{% static '@static/foo/bar/dynamic-example-1.md' %}</p>
+<p>{% static '@static/foo/bar/dynamic-example-2.md' %}</p>

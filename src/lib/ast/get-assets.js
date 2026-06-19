@@ -37,6 +37,11 @@ function getNodeValue(node) {
 }
 
 async function filterPaths([path, paths]) {
+    const firstPath = Array.isArray(paths) ? paths[0] : paths;
+    if (firstPath && firstPath.isDynamic()) {
+        return [path, firstPath];
+    }
+
     try {
         const importPath = await getFirstExistedPath(paths);
         return [path, importPath];
@@ -51,16 +56,17 @@ async function filterPaths([path, paths]) {
 
 /**
  * @param {nunjucks.nodes.Root} nodes
- * @param {string[]}            searchAssets
+ * @param {string}            templateContext
+ * @param {Object}            [webpackAlias]
  * @returns {Promise<[ImportWrapper, ImportWrapper][]>}
  */
-export function getAssets(nodes, searchAssets) {
+export function getAssets(nodes, templateContext, webpackAlias = {}) {
     const assets = getNodesValues(
         nodes,
         nunjucks.nodes.CallExtensionAsync,
         getNodeValue
     ).filter(isUniqueAsset);
-    const possiblePaths = getPossiblePaths(assets, searchAssets);
+    const possiblePaths = getPossiblePaths(assets, templateContext, webpackAlias);
     const resolvedAssets = possiblePaths.map(filterPaths);
 
     return Promise.all(resolvedAssets);

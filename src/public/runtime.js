@@ -3,19 +3,27 @@ import nunjucks from 'nunjucks/browser/nunjucks-slim';
 import {WebpackPrecompiledLoader} from './WebpackPrecompiledLoader';
 
 
-export default function runtime(options, {
-    globals,
-    extensions,
-    filters,
-    templates: precompiled
-}) {
-    if (options.jinjaCompat === true) {
+export default function runtime(options, deps) {
+    const {
+        __webpackAlias__: aliasMap = {},
+        __webpackContext__: context = '',
+        ...nunjucksOptions
+    } = options;
+
+    const {
+        globals,
+        extensions,
+        filters,
+        templates: precompiled
+    } = deps;
+
+    if (nunjucksOptions.jinjaCompat === true) {
         nunjucks.installJinjaCompat();
     }
 
     const env = new nunjucks.Environment(
-        new WebpackPrecompiledLoader(precompiled),
-        options
+        new WebpackPrecompiledLoader(precompiled, aliasMap, context),
+        nunjucksOptions
     );
 
     for (const globalName in globals) {
