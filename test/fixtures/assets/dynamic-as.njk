@@ -1,8 +1,0 @@
-{% extends '@assets/base.njk' %}
-
-{% block body %}
-    {%- static '@static/foo/bar/dynamic-example-1.md' as dynamic_asset %}
-    <p>{{ dynamic_asset }}</p>
-    {%- static '@static/foo/bar/dynamic-example-2.md' as dynamic_asset2 %}
-    <p>{{ dynamic_asset2 }}</p>
-{% endblock body %}

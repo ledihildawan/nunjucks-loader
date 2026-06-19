@@ -1,8 +1,0 @@
-{% extends '@assets/base.njk' %}
-{% from '@assets/_imagefullwidth.njk' import ImageFullWidth with context %}
-
-{% block body %}
-    {% call ImageFullWidth() %}
-        <img src="{% static '@static/foo/bar/test.txt' %}" alt="maps" />
-    {% endcall %}
-{% endblock %}

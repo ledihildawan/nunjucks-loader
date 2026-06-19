@@ -8,34 +8,19 @@ import {precompileToLocalVar} from './precompile/precompile-to-local-var';
 import {wrapAddons} from './precompile/wrap-addons';
 
 
-const staticExtensionPath = require.resolve(
-    '../public/static-extension/get-static-extension'
-);
-
 /**
  * Register resolved file paths as webpack dependencies so that
  * webpack properly tracks them during incremental rebuilds / HMR.
  *
- * Without this, assets from included templates can be lost during
- * live reload because the transitive import chain (parent → include → asset)
- * may not be fully preserved by webpack's incremental compilation.
- *
  * @param {Object} loaderContext
  * @param {Array<[ImportWrapper, ImportWrapper]>} templates
- * @param {Array<[ImportWrapper, ImportWrapper]>} assets
  */
-function registerDependencies(loaderContext, templates, assets) {
+function registerDependencies(loaderContext, templates) {
     if (typeof loaderContext.addDependency !== 'function') {
         return;
     }
 
     for (const [, resolvedPath] of templates) {
-        if (!resolvedPath.isDynamic()) {
-            loaderContext.addDependency(resolvedPath.toString());
-        }
-    }
-
-    for (const [, resolvedPath] of assets) {
         if (!resolvedPath.isDynamic()) {
             loaderContext.addDependency(resolvedPath.toString());
         }
@@ -57,10 +42,7 @@ export async function doTransform(source, loaderContext, {
     };
 
     const wrappedAddons = wrapAddons(
-        {
-            StaticExtension: staticExtensionPath,
-            ...options.extensions
-        },
+        options.extensions,
         options.filters,
         options.globals,
         {
@@ -89,12 +71,10 @@ export async function doTransform(source, loaderContext, {
 
     registerDependencies(
         loaderContext,
-        usedDependencies.templates,
-        usedDependencies.assets
+        usedDependencies.templates
     );
 
     const outputImports = await getTemplateImports(loaderContext, options.esModule, {
-        assets: usedDependencies.assets,
         dependencies: usedDependencies.templates,
         extensions: usedDependencies.extensions,
         filters: usedDependencies.filters,
@@ -126,7 +106,6 @@ export async function doTransform(source, loaderContext, {
         imports: outputImports,
         precompiled: outputPrecompiled,
         envOptions,
-        defaultExport: outputExport,
-        webpackAlias
+        defaultExport: outputExport
     });
 }

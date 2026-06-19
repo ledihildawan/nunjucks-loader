@@ -29,7 +29,6 @@ function getImports(imports, assignments) {
     ${TEMPLATE_DEPENDENCIES}.globals = ${getAssignments(assignments.globals)}
     ${TEMPLATE_DEPENDENCIES}.extensions = ${getAssignments(assignments.extensions)}
     ${TEMPLATE_DEPENDENCIES}.filters = ${getAssignments(assignments.filters)}
-    ${TEMPLATE_DEPENDENCIES}.assets = ${getAssignments(assignments.assets)}
     `;
 }
 
@@ -61,7 +60,7 @@ function getDynamicTemplateImport(loaderContext, fullPath, importVar) {
     return `
     var ${importVar} = (function() {
         var __context = require.context(${directory}, true, ${regExp});
-        var __result = {${TEMPLATE_DEPENDENCIES}: {templates: {}, globals: {}, extensions: {}, filters: {}, assets: {}}};
+        var __result = {${TEMPLATE_DEPENDENCIES}: {templates: {}, globals: {}, extensions: {}, filters: {}}};
         __context.keys().forEach(function(__key) {
             var __mod = __context(__key);
             var __dep = (__mod && __mod.default || __mod);
@@ -70,7 +69,6 @@ function getDynamicTemplateImport(loaderContext, fullPath, importVar) {
                 Object.assign(__result.${TEMPLATE_DEPENDENCIES}.globals, __dep.${TEMPLATE_DEPENDENCIES}.globals || {});
                 Object.assign(__result.${TEMPLATE_DEPENDENCIES}.extensions, __dep.${TEMPLATE_DEPENDENCIES}.extensions || {});
                 Object.assign(__result.${TEMPLATE_DEPENDENCIES}.filters, __dep.${TEMPLATE_DEPENDENCIES}.filters || {});
-                Object.assign(__result.${TEMPLATE_DEPENDENCIES}.assets, __dep.${TEMPLATE_DEPENDENCIES}.assets || {});
             }
         });
         return __result;
@@ -97,8 +95,7 @@ function foldDependenciesToImports(
                 templates: join('templates'),
                 globals: join('globals'),
                 extensions: join('extensions'),
-                filters: join('filters'),
-                assets: join('assets')
+                filters: join('filters')
             }
         ];
     }
@@ -114,8 +111,7 @@ function foldDependenciesToImports(
             templates: join('templates'),
             globals: join('globals'),
             extensions: join('extensions'),
-            filters: join('filters'),
-            assets: join('assets')
+            filters: join('filters')
         }
     ];
 }
@@ -141,8 +137,7 @@ export function getTemplateDependenciesImport(loaderContext, esModule, dependenc
             templates: '',
             globals: '',
             extensions: '',
-            filters: '',
-            assets: ''
+            filters: ''
         }])
     );
 }

@@ -1,6 +1,5 @@
 import path from 'path';
 
-import {getAssets} from '../ast/get-assets';
 import {getTemplatesImports} from '../ast/get-templates-imports';
 import {getUsedExtensions} from '../ast/get-used-extensions';
 import {getUsedFilters} from '../ast/get-used-filters';
@@ -31,16 +30,17 @@ export async function getUsedDependencies(
     const resourcePath = loaderContext.resourcePath;
     const templateContext = path.dirname(resourcePath);
 
-    const [templates, assets] = await Promise.all([
-        getTemplatesImports(loaderContext, nodes, templateContext, webpackAlias),
-        getAssets(nodes, templateContext, webpackAlias)
-    ]);
+    const templates = await getTemplatesImports(
+        loaderContext,
+        nodes,
+        templateContext,
+        webpackAlias
+    );
 
     return {
         templates,
         globals: getUsedGlobals(nodes, globals),
         extensions: getUsedExtensions(nodes, extensions),
-        filters: getUsedFilters(nodes, filters),
-        assets
+        filters: getUsedFilters(nodes, filters)
     };
 }
