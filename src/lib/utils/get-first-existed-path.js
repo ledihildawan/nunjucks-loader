@@ -19,9 +19,10 @@ async function isExists(path) {
     }
 
     try {
-        await fsAccess(path.toString());
+        const pathStr = path.toString().replace(/\\/g, '/');
+        await fsAccess(pathStr);
         return true;
-    } catch (exception) {
+    } catch {
         return false;
     }
 }

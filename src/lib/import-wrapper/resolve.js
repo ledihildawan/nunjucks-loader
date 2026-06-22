@@ -19,10 +19,9 @@ export function resolve(prependPath, templateImport) {
         firstPart = '';
     }
 
-    const filePath = normalizeTrailingSlash(
-        path.resolve(prependPath, firstPart.valueOf()),
-        firstPart
-    );
+    const resolvedPath = path.resolve(prependPath, firstPart.valueOf());
+    const normalizedPath = path.normalize(resolvedPath).replace(/\\/g, '/');
+    const filePath = normalizeTrailingSlash(normalizedPath, firstPart);
 
     _templateImport.unshift(new ImportLiteral(filePath));
 

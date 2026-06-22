@@ -148,6 +148,54 @@ globals returned value
 "
 `;
 
+exports[`Advanced compilation relative path resolution should resolve relative path imports (../) from nested directory 1`] = `
+"
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nested Relative Path Test</title>
+</head>
+<body>
+    
+<button class=\\"btn\\">From nested folder</button>
+
+</body>
+</html>"
+`;
+
+exports[`Advanced compilation relative path resolution should resolve relative path imports (../) in sibling nested directory 1`] = `
+"
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Component Relative Path Test</title>
+</head>
+<body>
+    
+<button class=\\"btn\\">Component button</button>
+
+</body>
+</html>"
+`;
+
+exports[`Advanced compilation relative path resolution should resolve relative path imports (./) from same directory 1`] = `
+"
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relative Path Test</title>
+</head>
+<body>
+    
+<button class=\\"btn\\">Click me</button>
+
+</body>
+</html>"
+`;
+
 exports[`Advanced compilation should compile templates with non-relative paths 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">

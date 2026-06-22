@@ -1,3 +1,5 @@
+import path from 'path';
+
 import {hasAsyncTags} from './ast/has-async-tags';
 import {getLoaderOutput} from './output/get-loader-output';
 import {getTemplateImports} from './output/get-template-imports';
@@ -55,7 +57,8 @@ export async function doTransform(source, loaderContext, {
         wrappedAddons.extensions,
         nunjucksOptions
     );
-    const webpackAlias = loaderContext._compiler.options.resolve?.alias || {};
+    const compilerAlias = loaderContext._compiler.options.resolve?.alias || {};
+    const webpackAlias = Object.keys(options.webpackAlias || {}).length > 0 ? options.webpackAlias : compilerAlias;
 
     const usedDependencies = await getUsedDependencies(
         loaderContext,
@@ -98,7 +101,9 @@ export async function doTransform(source, loaderContext, {
         jinjaCompat: options.jinjaCompat,
         isAsyncTemplate: hasAsyncTags(nodes),
         // Webpack alias map for runtime template resolution
-        __webpackAlias__: webpackAlias
+        __webpackAlias__: webpackAlias,
+        // Context directory for resolving relative template paths
+        __webpackContext__: path.dirname(resourcePathImport)
     });
 
     return getLoaderOutput({

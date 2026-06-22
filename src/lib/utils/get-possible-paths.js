@@ -8,9 +8,10 @@ import {resolveSearchPaths} from './resolve-search-paths';
  */
 export function getPossiblePaths(paths, templateContext, webpackAlias = {}) {
     return paths.map(function(possiblePath) {
+        const resolved = resolveSearchPaths(possiblePath, templateContext, webpackAlias);
         return [
             possiblePath,
-            resolveSearchPaths(possiblePath, templateContext, webpackAlias)
+            resolved
         ];
     });
 }

@@ -91,5 +91,5 @@ export function resolveSearchPaths(possiblePath, templateContext, webpackAlias =
         return [fromRoot];
     }
 
-    return resolve(templateContext, aliasedPath);
+    return [resolve(templateContext, aliasedPath)];
 }

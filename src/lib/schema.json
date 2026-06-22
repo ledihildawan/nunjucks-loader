@@ -75,6 +75,9 @@
     "esModule": {
       "type": "boolean",
       "default": false
+    },
+    "webpackAlias": {
+      "type": "object"
     }
   },
   "additionalProperties": false

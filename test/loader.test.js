@@ -116,6 +116,26 @@ describe('Advanced compilation', function() {
         });
     });
 
+    describe('relative path resolution', function() {
+        test('should resolve relative path imports (./) from same directory', async function() {
+            const output = await compiler('fixtures/relative-paths/main.njk', loaderBaseOptions);
+
+            expect(output()).toMatchSnapshot();
+        });
+
+        test('should resolve relative path imports (../) from nested directory', async function() {
+            const output = await compiler('fixtures/relative-paths/nested/page.njk', loaderBaseOptions);
+
+            expect(output()).toMatchSnapshot();
+        });
+
+        test('should resolve relative path imports (../) in sibling nested directory', async function() {
+            const output = await compiler('fixtures/relative-paths/nested/component.njk', loaderBaseOptions);
+
+            expect(output()).toMatchSnapshot();
+        });
+    });
+
     describe('globals', function() {
         const loaderOptions = {
             ...loaderBaseOptions,

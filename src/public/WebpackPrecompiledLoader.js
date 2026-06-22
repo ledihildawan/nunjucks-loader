@@ -1,6 +1,7 @@
-export function WebpackPrecompiledLoader(precompiled = {}, aliasMap = {}) {
+export function WebpackPrecompiledLoader(precompiled = {}, aliasMap = {}, context = '') {
     this.precompiled = precompiled;
     this.aliasMap = aliasMap;
+    this.context = context;
 }
 
 WebpackPrecompiledLoader.prototype.resolve = function resolve(from, to) {
@@ -79,6 +80,32 @@ WebpackPrecompiledLoader.prototype.getSource = function getSource(name) {
             src: { type: 'code', obj: this.precompiled[foundByEnding] },
             path: foundByEnding
         };
+    }
+
+    if (name.startsWith('./') || name.startsWith('../')) {
+        const pathModule = require('path');
+        const contextPath = this.context || '.';
+        const resolvedPath = pathModule.resolve(contextPath, name);
+        const normalizedResolved = normalizeTemplateKey(resolvedPath);
+
+        if (normalizedResolved in this.precompiled) {
+            return {
+                src: { type: 'code', obj: this.precompiled[normalizedResolved] },
+                path: normalizedResolved
+            };
+        }
+
+        const foundByResolvedEnding = Object.keys(this.precompiled).find(k =>
+            normalizeTemplateKey(k).endsWith(name.replace(/^\.\//, '/')) ||
+            normalizeTemplateKey(k).endsWith('/' + name.replace(/^\.\//, ''))
+        );
+
+        if (foundByResolvedEnding) {
+            return {
+                src: { type: 'code', obj: this.precompiled[foundByResolvedEnding] },
+                path: foundByResolvedEnding
+            };
+        }
     }
 
     return null;
