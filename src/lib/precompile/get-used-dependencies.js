@@ -1,4 +1,4 @@
-import path from 'path';
+import { dirname } from 'pathe';
 
 import {getTemplatesImports} from '../ast/get-templates-imports';
 import {getUsedExtensions} from '../ast/get-used-extensions';
@@ -28,7 +28,7 @@ export async function getUsedDependencies(
     } = loaderOptions;
 
     const resourcePath = loaderContext.resourcePath;
-    const templateContext = path.dirname(resourcePath);
+    const templateContext = dirname(resourcePath);
 
     const templates = await getTemplatesImports(
         loaderContext,

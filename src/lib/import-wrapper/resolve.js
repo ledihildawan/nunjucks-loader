@@ -1,4 +1,4 @@
-import path from 'path';
+import { resolve as patheResolve, normalize as patheNormalize } from 'pathe';
 
 import {ImportLiteral} from './ImportLiteral';
 import {ImportSymbol} from './ImportSymbol';
@@ -19,8 +19,8 @@ export function resolve(prependPath, templateImport) {
         firstPart = '';
     }
 
-    const resolvedPath = path.resolve(prependPath, firstPart.valueOf());
-    const normalizedPath = path.normalize(resolvedPath).replace(/\\/g, '/');
+    const resolvedPath = patheResolve(prependPath, firstPart.valueOf());
+    const normalizedPath = patheNormalize(resolvedPath);
     const filePath = normalizeTrailingSlash(normalizedPath, firstPart);
 
     _templateImport.unshift(new ImportLiteral(filePath));

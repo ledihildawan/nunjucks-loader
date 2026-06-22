@@ -1,4 +1,4 @@
-import path from 'path';
+import { resolve as patheResolve } from 'pathe';
 
 import {ImportLiteral} from '../import-wrapper/ImportLiteral';
 import {ImportWrapper} from '../import-wrapper/ImportWrapper';
@@ -20,7 +20,7 @@ function applyWebpackAlias(possiblePath, webpackAlias) {
                     const aliasValue = Array.isArray(aliasPath) ? aliasPath[0] : aliasPath;
                     const remainingPath = firstValue.slice(aliasName.length);
                     const normalizedRemaining = remainingPath.startsWith('/') ? remainingPath.slice(1) : remainingPath;
-                    const resolvedFirst = path.resolve(aliasValue, normalizedRemaining);
+                    const resolvedFirst = patheResolve(aliasValue, normalizedRemaining);
 
                     const newPath = possiblePath.map((item, index) => {
                         if (index === 0 && item instanceof ImportLiteral) {
@@ -42,7 +42,7 @@ function applyWebpackAlias(possiblePath, webpackAlias) {
             const aliasValue = Array.isArray(aliasPath) ? aliasPath[0] : aliasPath;
             const remainingPath = pathStr.slice(aliasName.length);
             const normalizedRemaining = remainingPath.startsWith('/') ? remainingPath.slice(1) : remainingPath;
-            const resolvedPath = path.resolve(aliasValue, normalizedRemaining);
+            const resolvedPath = patheResolve(aliasValue, normalizedRemaining);
 
             return {
                 path: new ImportWrapper([new ImportLiteral(resolvedPath)]),

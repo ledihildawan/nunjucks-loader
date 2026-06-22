@@ -1,3 +1,5 @@
+import { resolve, dirname, normalize } from 'pathe';
+
 export function WebpackPrecompiledLoader(precompiled = {}, aliasMap = {}, context = '') {
     this.precompiled = precompiled;
     this.aliasMap = aliasMap;
@@ -9,16 +11,14 @@ WebpackPrecompiledLoader.prototype.resolve = function resolve(from, to) {
         if (to.startsWith(aliasName + '/') || to === aliasName) {
             const aliasValue = Array.isArray(aliasPath) ? aliasPath[0] : aliasPath;
             const remainingPath = to.slice(aliasName.length);
-            const pathModule = require('path');
-            return pathModule.resolve(aliasValue, remainingPath);
+            return resolve(aliasValue, remainingPath);
         }
     }
-    const pathModule = require('path');
-    return pathModule.resolve(pathModule.dirname(from), to);
+    return resolve(dirname(from), to);
 };
 
 function normalizeTemplateKey(pathStr) {
-    return pathStr.replace(/\\/g, '/');
+    return normalize(pathStr);
 }
 
 WebpackPrecompiledLoader.prototype.getSource = function getSource(name) {
@@ -41,8 +41,7 @@ WebpackPrecompiledLoader.prototype.getSource = function getSource(name) {
         if (name.startsWith(aliasName + '/') || name === aliasName) {
             const aliasValue = Array.isArray(aliasPath) ? aliasPath[0] : aliasPath;
             const remainingPath = name.slice(aliasName.length);
-            const pathModule = require('path');
-            const absPath = pathModule.resolve(aliasValue, remainingPath);
+            const absPath = resolve(aliasValue, remainingPath);
             const normalizedAbs = normalizeTemplateKey(absPath);
 
             const foundKey = Object.keys(this.precompiled).find(k =>
@@ -83,9 +82,8 @@ WebpackPrecompiledLoader.prototype.getSource = function getSource(name) {
     }
 
     if (name.startsWith('./') || name.startsWith('../')) {
-        const pathModule = require('path');
         const contextPath = this.context || '.';
-        const resolvedPath = pathModule.resolve(contextPath, name);
+        const resolvedPath = resolve(contextPath, name);
         const normalizedResolved = normalizeTemplateKey(resolvedPath);
 
         if (normalizedResolved in this.precompiled) {

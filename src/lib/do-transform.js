@@ -1,4 +1,4 @@
-import path from 'path';
+import { dirname } from 'pathe';
 
 import {hasAsyncTags} from './ast/has-async-tags';
 import {getLoaderOutput} from './output/get-loader-output';
@@ -103,7 +103,7 @@ export async function doTransform(source, loaderContext, {
         // Webpack alias map for runtime template resolution
         __webpackAlias__: webpackAlias,
         // Context directory for resolving relative template paths
-        __webpackContext__: path.dirname(resourcePathImport)
+        __webpackContext__: dirname(resourcePathImport)
     });
 
     return getLoaderOutput({
