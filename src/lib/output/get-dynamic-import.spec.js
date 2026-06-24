@@ -1,4 +1,7 @@
+import {ImportWrapper} from '../import-wrapper/ImportWrapper';
+
 import {getDynamicImport} from './get-dynamic-import';
+
 
 describe('get-dynamic-import', function() {
     const loaderContext = {
@@ -58,5 +61,43 @@ describe('get-dynamic-import', function() {
         const result = getDynamicImport(loaderContext, assetPath, assetImport, {esModule: false, importVar: 'myVar'});
 
         expect(result).toBe('const myVar = require(style-loader!css-loader!"./styles.css");');
+    });
+
+    test('should handle dynamic inline loaders with esModule', function() {
+        const assetImport = new ImportWrapper();
+        assetImport.addLiteral('!css-loader!./');
+        assetImport.addSymbol('name');
+        assetImport.addLiteral('.css');
+
+        const result = getDynamicImport(loaderContext, {}, assetImport, {esModule: true, importVar: 'myVar'});
+
+        expect(result).toBe(`const myVar = function(name) {
+            return import("!css-loader!./" + name + ".css");
+        };`);
+    });
+
+    test('should handle dynamic inline loaders with require syntax', function() {
+        const assetImport = new ImportWrapper();
+        assetImport.addLiteral('!css-loader!./');
+        assetImport.addSymbol('name');
+        assetImport.addLiteral('.css');
+
+        const result = getDynamicImport(loaderContext, {}, assetImport, {esModule: false, importVar: 'myVar'});
+
+        expect(result).toBe(`const myVar = function(name) {
+            return require("!css-loader!./" + name + ".css");
+        };`);
+    });
+
+    test('should handle dynamic paths without inline loaders', function() {
+        const assetImport = new ImportWrapper();
+        assetImport.addLiteral('./templates/');
+        assetImport.addSymbol('name');
+
+        const result = getDynamicImport(loaderContext, {}, assetImport, {esModule: true, importVar: 'myVar'});
+
+        expect(result).toBe(`const myVar = function(name) {
+            return import("./templates/" + name);
+        };`);
     });
 });
